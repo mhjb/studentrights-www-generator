@@ -1,0 +1,50 @@
+_ = require 'lodash'
+
+acts_and_links =
+  "Education Act 1964": "http://www.legislation.govt.nz/act/public/1964/0135/latest/DLM356732.html"
+  "Education Act 1989": "http://legislation.govt.nz/act/public/1989/0080/latest/DLM175959.html"
+  "Education (Stand-Down, Suspension, Exclusion, and Expulsion) Rules 1999": "http://www.legislation.govt.nz/regulation/public/1999/0202/latest/DLM288425.html"
+  "New Zealand Bill of Rights Act 1990": "http://www.legislation.govt.nz/act/public/1990/0109/latest/whole.html"
+  "Human Rights Act 1993": "http://www.legislation.govt.nz/act/public/1993/0082/latest/DLM304475.html"
+  "Health (Immunisation) Regulations 1995": "http://www.legislation.govt.nz/regulation/public/1995/0304/latest/whole.html"
+  "Health (Infectious and Notifiable Diseases) Regulations 1966": "http://www.legislation.govt.nz/regulation/public/1966/0087/latest/DLM24207.html"
+  "Education (School Attendance) Regulations 1951": "http://legislation.govt.nz/regulation/public/1951/0181/4.0/DLM5587.html"
+  "Private Schools Conditional Integration Act 1975": "http://www.legislation.govt.nz/act/public/1975/0129/latest/DLM437347.html"
+  "National Administration Guidelines": "https://education.govt.nz/ministry-of-education/legislation/nags/"
+  "National Education Goal": "https://education.govt.nz/ministry-of-education/legislation/negs/"
+  "Te Ture mō te Reo Māori\/the Māori Language Act": "http://www.legislation.govt.nz/act/public/2016/0017/29.0/DLM6174509.html"
+  "United Nations Conventions on the Rights of the Child": "http://www.ohchr.org/EN/ProfessionalInterest/Pages/CRC.aspx"
+  "International Covenant on Civil and Political Rights": "http://www.ohchr.org/EN/ProfessionalInterest/Pages/CCPR.aspx"
+  "Assessment (including Examination) Rules for Schools with Consent to Assess 2015": "http://www.nzqa.govt.nz/about-us/our-role/legislation/nzqa-rules/expired-rules/teo-rules-for-achievement-stds-2015/"
+  "The Ministry Of Education Health And Safety Code Of Practice For State And State Integrated Schools": "http://www.nzqa.govt.nz/about-us/our-role/legislation/nzqa-rules/expired-rules/teo-rules-for-achievement-stds-2015/"
+  "Education (School Trustee Elections) Regulations 2000": "http://www.legislation.govt.nz/regulation/public/2000/0195/latest/DLM8656.html"
+  "Health and Safety at Work Act 2015": "http://www.legislation.govt.nz/act/public/2015/0070/latest/DLM5976660.html"
+  "Accident Compensation Act 2001": "http://www.legislation.govt.nz/act/public/2001/0049/latest/DLM99494.html"
+  "Code of Ethics for Registered Teachers": "https://teachersandsocialmedia.co.nz/sites/default/files/resources/coe-poster-english.pdf"
+  "Health Conditions in Education Settings": "https://education.govt.nz/ministry-of-education/specific-initiatives/health-and-safety/practice-framework-resources-for-health-and-safety/health-conditions-in-education-settings-supporting-children-and-young-people/"
+  "Crimes Act 1961": "http://www.legislation.govt.nz/act/public/1961/0043/latest/whole.html"
+  "Compliance Document for New Zealand Building Code, cl G1": "https://www.building.govt.nz/assets/Uploads/building-code-compliance/g-services-and-facilities/g1-personal-hygiene/asvm/G1-personal-hygiene-2nd-edition-amendment-6.pdf"
+  "Education Outside the Classroom Guidelines": "http://eotc.tki.org.nz/EOTC-home/EOTC-Guidelines"
+  "Summary Offences Act 1981": "http://www.legislation.govt.nz/act/public/1981/0113/latest/whole.html"
+  "New Zealand Bill of Rights 1990": "http://www.legislation.govt.nz/act/public/1990/0109/latest/DLM224792.html"
+  "Bovaird and the Board of Trustees of Lyndfield College v J (2008)": "http://www.nzsta.org.nz/media/1733/lynfield-decision-.pdf"
+  "Privacy Act 1993": "http://www.legislation.govt.nz/act/public/1993/0028/latest/whole.html"
+  "Ombudsmen Act 1975": "http://www.legislation.govt.nz/act/public/1975/0009/196.0/whole.html"
+  "Education (Surrender, Retention, and Search) Rules 2013": "http://www.legislation.govt.nz/regulation/public/2013/0469/latest/whole.html"
+  "Guidelines for the Surrender and Retention of Property and Searches": "https://education.govt.nz/school/managing-and-supporting-students/student-behaviour-help-and-guidance/searching-and-removing-student-property/"
+  "Children, Young Persons, and Their Families Act 1989": "http://www.legislation.govt.nz/act/public/1989/0024/latest/whole.html"
+  "Harassment Act 1997": "http://www.legislation.govt.nz/act/public/1997/0092/latest/whole.html"
+  "Telecommunications Act 2001": "http://www.legislation.govt.nz/act/public/2001/0103/latest/DLM124961.html"
+  "Education (Hostels) Regulations 2005": "http://legislation.govt.nz/regulation/public/2005/0332/13.0/whole.html"
+  "Health Act 1956": "http://www.legislation.govt.nz/act/public/1956/0065/latest/DLM306662.html"
+  "Health Information Privacy Code 1994": "http://www.privacy.org.nz/assets/Files/Codes-of-Practice-materials/Health-Information-Privacy-Code-1994-including-Amendment.pdf"
+  "Public Records Act 2005": "http://www.legislation.govt.nz/act/public/2005/0040/latest/DLM345529.html"
+  "Search and Surveillance Act 2012": "http://www.legislation.govt.nz/act/public/2012/0024/latest/whole.html"
+  "Trespass Act 1980": "http://www.legislation.govt.nz/act/public/1980/0065/latest/whole.html"
+  "Battison v Melloy [2014] NZHC 1462": "https://static.stuff.co.nz/files/LucanCourt.pdf"
+
+module.exports =
+  (act) ->
+    _.find acts_and_links, (key, collection) ->
+      regex = new RegExp '.*' + _.escapeRegExp(collection) + '.*'
+      act.match regex
