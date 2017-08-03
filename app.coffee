@@ -27,6 +27,9 @@ remove_wrapping_elements = (array_of_selectors) ->
       .each (i, e) ->
         $(e).replaceWith $(e).html()
 
+remove_chapter_number = (text) -> text.replace /(\d\. ?\t)/g, ''
+
+
 $ = cheerio.load fs.readFileSync "problems at school.html"
 
 remove_wrapping_elements ['.xref-box', '.xref', '.xref', '.url', '.chap-num', '.chapter-for-running-head', 'span:not([class!=""])']
@@ -54,7 +57,7 @@ $('a').each (i, e) ->
   id = $(e).attr 'id'
   if id
     if $(e).parent().is('h1') or $(e).parent().is('h2')
-      section = $(e).parent().text()
+      section = remove_chapter_number $(e).parent().text()
     else
       section = $(e).parent().prevAll('h2').eq(0).text()
     section = section.replace(/(\t)/g, ' ').replace(/(:)/g, '')
@@ -79,9 +82,10 @@ $('p').each (i, e) ->
   $(e).html $(e).html().replace /((0800|\(0\d\))[\d ]{3,8})/g, "<span itemprop=\"telephone\" content=\"$1\"><a href=\"tel:$1\">$1</strong></a></span>"
 
 
+# build main & chapter contents pages
 main_contents = "<ul class=\"contents\">\n"
 $('h1').each (i, e) ->
-  h1_heading = $(e).text().replace(/(\d\. ?\t)/g, '')
+  h1_heading = remove_chapter_number $(e).text()
   h1_file = h1_heading.replace(/:/g, '') + '.html'
   h1_breadcrumb = "<p class=\"breadcrumb\"><a href=\"../index.html\">Student Rights</a>\n > <a href=\"index.html\">Problems at School</a>\n > #{h1_heading}</p>"
   content = h1_breadcrumb + "<h1>#{h1_heading}</h1>\n" + $(e).nextUntil('h2')
@@ -110,7 +114,6 @@ $('h1').each (i, e) ->
   write_file_with_template h1_file, h1_heading, content + section_contents
 
 main_contents += "</ul>"
-
 write_file_with_template 'index.html', 'Problems at School', intro + main_contents
 
 headings = []
