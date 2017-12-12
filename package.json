@@ -1,7 +1,7 @@
 {
-  "name": "pas-search",
+  "name": "studentrights-www-generator",
   "version": "1.0.0",
-  "description": "Problems at School search",
+  "description": "Student Rights website Problems at School pages generator",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

@@ -2,8 +2,9 @@ cheerio = require 'cheerio'
 fs = require 'fs'
 
 acts_and_links = require './acts-and-links'
-template = fs.readFileSync 'template.html'
-intro = fs.readFileSync 'intro.html'
+template = fs.readFileSync 'templates/template.html'
+intro = fs.readFileSync 'templates/intro.html'
+path = '../www/problems-at-school/'
 
 error_handler = (err) -> console.log err if err
 
@@ -15,11 +16,11 @@ switch_class_for_tag = (class_name, tag) ->
       $(e).replaceWith "<#{tag} id='#{id}'>#{$(e).html()}</#{tag}>"
 
 write_file_with_template = (filename, title, content) ->
-  populated_template = template
-    .toString()
+  populated_template = template.toString()
     .replace /{{title}}/g, title
     .replace /{{book}}/g, content
-  fs.writeFile "../www/problems-at-school/#{filename}", populated_template, 'utf8', error_handler
+  fs.writeFile path + filename, populated_template, 'utf8', error_handler
+  console.log "Writing #{path}#{filename}"
 
 remove_wrapping_elements = (array_of_selectors) ->
   array_of_selectors.forEach (selector) ->
@@ -30,15 +31,23 @@ remove_wrapping_elements = (array_of_selectors) ->
 remove_chapter_number = (text) -> text.replace /(\d\. ?\t)/g, ''
 
 
-$ = cheerio.load fs.readFileSync "problems at school.html"
+pas_text = fs.readFileSync "problems at school.html"
 
-remove_wrapping_elements ['.xref-box', '.xref', '.xref', '.url', '.chap-num', '.chapter-for-running-head', 'span:not([class!=""])']
+pas_text = pas_text.toString()
+  .replace //g, '✔'  # fix bad checks & crosses
+  .replace //g, '✘'
+  .replace /<p class="body">&#160;<\/p>/gi, ''  # get rid of some empty paras
+  .replace /<p class="Heading-4-first">&#160;<\/p>/gi, ''
+
+$ = cheerio.load pas_text
+
+remove_wrapping_elements ['div:not([class])', 'div:not([class])', '.xref-box', '.xref', '.xref', '.url', '.chap-num', '.chapter-for-running-head', 'span:not([class!=""])']
 
 $('.char-style-override-3').remove() # bullets
 $('.char-style-override-5').remove() # numbers
 $('.No-Paragraph-Style').remove()
-$('.frame-2').remove() #images
-$('table').remove() # temporary
+$('.frame-2').remove() # images
+
 
 switch_class_for_tag 'p.Heading-1', 'h1'
 switch_class_for_tag 'p.Heading-2', 'h2'
@@ -123,12 +132,14 @@ headings = []
     if selector is 'h1' or selector is 'h2'
       section = $(e).text()
     else
-      section = $(e).prevAll('h2').eq(0).text()
-    section = section.replace(/(\t)/g, ' ').replace(/(:)/g, '')
-    link = encodeURI section + '.html#' + id
+      section = $(e).prevAll('h2,h1').eq(0).text()
+    section = section
+      .replace /(\t)/g, ' '
+      .replace /(:)/g, ''
     headings.push
-      label: $(e).text().replace(/(\t)/g, ' ')
-      value: $(e).text().replace(/(\t)/g, ' ')
-      link: link
+      label: $(e).text().replace /(\t)/g, ' '
+      value: $(e).text().replace /(\t)/g, ' '
+      link: encodeURI "#{section}.html##{id}"
+      section: section
 
-fs.writeFileSync "../www/problems-at-school/headings.json", JSON.stringify(headings, null, 4), 'utf8', error_handler
+fs.writeFileSync "#{path}/headings.json", JSON.stringify(headings, null, 4), 'utf8', error_handler
