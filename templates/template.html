@@ -43,12 +43,20 @@ $.getJSON('headings.json', function(data){
   var fuse = new Fuse(data, options); // "list" is the item array
 
   $(document).ready(function(){
+    var last_term = '';
     $("#search")
       .autocomplete({
-        source: function (request, response) { response(fuse.search(request.term)) },
+        source: function (request, response) {
+          last_term = request.term;
+          response(fuse.search(request.term));
+        },
         select: function(event, ui)
         {
           $("#search").val(ui.item.label);
+          gtag('event', 'search', {
+            event_category: 'engagement',
+            event_label: last_term + ': ' + ui.item.label,
+          });
           window.location.href = ui.item.link;
           return false;
         }

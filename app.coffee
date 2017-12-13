@@ -51,6 +51,7 @@ pas_text = pas_text.toString()
   .replace //g, '✘'
   .replace /<p class="body">&#160;<\/p>/gi, ''  # get rid of some empty paras
   .replace /<p class="Heading-4-first">&#160;<\/p>/gi, ''
+  .replace /([A-Z]{2}[A-Z]+)/g, '<span class="smallcaps">$1</span>'
 
 $ = cheerio.load pas_text
 
@@ -121,7 +122,7 @@ $('h1').each (i, e) ->
     h2_heading = $(e).text().replace(/(\t)/g, ' ')
     h2_file = section_to_filename h2_heading + '.html'
     h2_breadcrumb = "<p class=\"breadcrumb\"><a href=\"../index.html\">Student Rights</a>\n > <a href=\"index.html\">Problems at School</a> > <a href=\"#{h1_file}\">#{h1_heading}</a> > #{h2_heading}</p>\n"
-    h2_content = h2_breadcrumb + "<h2>#{h2_heading}</h2>\n" + $(e).nextUntil('h2')
+    h2_content = h2_breadcrumb + "<h2>#{h2_heading}</h2>\n" + $(e).nextUntil('h2,h1')
     write_file_with_template h2_file, h2_heading, h2_content
     sections.push
       section: h2_heading
