@@ -40,7 +40,7 @@ $.getJSON('headings.json', function(data){
     minMatchCharLength: 1,
     keys: ["label"]
   };
-  var fuse = new Fuse(data, options); // "list" is the item array
+  var fuse = new Fuse(data, options);
 
   $(document).ready(function(){
     var last_term = '';
@@ -80,9 +80,11 @@ $.getJSON('headings.json', function(data){
       <input id="search" placeholder="Search Problems at School …">
     </div>
 
-    <book>
+    <div class="book">
+      {{#if}}<a class="prev" href="{{prev}}">&#8249;</a>{{/if}}
+      {{#if}}<a class="next" href="{{next}}">&#8250;</a>{{/if}}
       {{book}}
-    </book>
+    </div>
   </div>
   <div id="footer">
     <ul class="contacts">

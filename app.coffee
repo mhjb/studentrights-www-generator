@@ -15,10 +15,22 @@ switch_class_for_tag = (class_name, tag) ->
         .replace /(\?)/g, ''
       $(e).replaceWith "<#{tag} id='#{id}'>#{$(e).html()}</#{tag}>"
 
-write_file_with_template = (filename, title, content) ->
+write_file_with_template = (filename, title, content, prev, next) ->
   populated_template = template.toString()
-    .replace /{{title}}/g, title
-    .replace /{{book}}/g, content
+    .replace /{{title}}/, title
+    .replace /{{book}}/, content
+  if prev
+    populated_template = populated_template
+      .replace /{{prev}}/, prev
+      .replace /{{#if}}(.*){{\/if}}/, '$1'
+  else
+    populated_template = populated_template.replace /{{#if}}.*{{prev}}.*{{\/if}}/, ''
+  if next
+    populated_template = populated_template
+      .replace /{{next}}/, next
+      .replace /{{#if}}(.*){{\/if}}/, '$1'
+  else
+    populated_template = populated_template.replace /{{#if}}.*{{next}}.*{{\/if}}/, ''
   fs.writeFile path + filename, populated_template, 'utf8', error_handler
   console.log "Writing #{path}#{filename}"
 
@@ -107,6 +119,7 @@ $('p').each (i, e) ->
 
 
 # build main & chapter contents pages
+pages = []
 main_contents = "<ul class=\"contents\">\n"
 $('h1').each (i, e) ->
   h1_heading = remove_chapter_number $(e).text()
@@ -118,12 +131,16 @@ $('h1').each (i, e) ->
   main_contents += "<li><a href=\"#{h1_file}\">#{h1_heading}</a>\n"
 
   sections = []
+  index_before_section = pages.length
   full_content.filter('h2').each (i,e) ->
     h2_heading = $(e).text().replace(/(\t)/g, ' ')
     h2_file = section_to_filename h2_heading + '.html'
     h2_breadcrumb = "<p class=\"breadcrumb\"><a href=\"../index.html\">Student Rights</a>\n > <a href=\"index.html\">Problems at School</a> > <a href=\"#{h1_file}\">#{h1_heading}</a> > #{h2_heading}</p>\n"
     h2_content = h2_breadcrumb + "<h2>#{h2_heading}</h2>\n" + $(e).nextUntil('h2,h1')
-    write_file_with_template h2_file, h2_heading, h2_content
+    pages.push
+      file: h2_file
+      title: h2_heading
+      content: h2_content
     sections.push
       section: h2_heading
       file: h2_file
@@ -135,10 +152,21 @@ $('h1').each (i, e) ->
 
   main_contents += section_contents + "</li>\n"
 
-  write_file_with_template h1_file, h1_heading, content + section_contents
+  pages.splice index_before_section, 0,
+    file: h1_file
+    title: h1_heading
+    content: content + section_contents
 
 main_contents += "</ul>"
-write_file_with_template 'index.html', 'Problems at School', intro + main_contents
+pages.unshift
+  file: 'index.html'
+  title: 'Problems at School'
+  content: intro + main_contents
+
+pages.forEach (page, index) ->
+  if index > 0 then prev = pages[index - 1].file else prev = null
+  if index < pages.length - 1 then next = pages[index + 1].file else next = null
+  write_file_with_template page.file, page.title, page.content, prev, next
 
 headings = []
 ['h5', 'h4', 'h3', 'h2', 'h1'].forEach (selector) ->
