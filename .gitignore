@@ -40,9 +40,11 @@ jspm_packages
 config/*.json
 .vscode
 
-start.sh
-wagbot.db
 .DS_Store
 .env
 coffeelint.json
-
+problems-at-school-web-resources
+export
+*.indd
+pages.array
+problems at school*.html

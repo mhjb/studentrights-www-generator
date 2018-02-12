@@ -21,14 +21,14 @@ write_file_with_template = (filename, title, content, prev, next) ->
     .replace /{{book}}/, content
   if prev
     populated_template = populated_template
-      .replace /{{prev}}/, prev
-      .replace /{{#if}}(.*){{\/if}}/, '$1'
+      .replace /{{prev}}/g, prev
+      .replace /{{#if}}(.*){{\/if}}/g, '$1'
   else
     populated_template = populated_template.replace /{{#if}}.*{{prev}}.*{{\/if}}/, ''
   if next
     populated_template = populated_template
-      .replace /{{next}}/, next
-      .replace /{{#if}}(.*){{\/if}}/, '$1'
+      .replace /{{next}}/g, next
+      .replace /{{#if}}(.*){{\/if}}/g, '$1'
   else
     populated_template = populated_template.replace /{{#if}}.*{{next}}.*{{\/if}}/, ''
   fs.writeFile path + filename, populated_template, 'utf8', error_handler
