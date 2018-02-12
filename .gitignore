@@ -43,8 +43,8 @@ config/*.json
 .DS_Store
 .env
 coffeelint.json
-problems-at-school-web-resources
+problems-at-school-web-resources/
 export
 *.indd
 pages.array
-problems at school*.html
+problems at schoo*.html
