@@ -11,7 +11,9 @@
   "license": "ISC",
   "dependencies": {
     "cheerio": "^0.22.0",
-    "coffeescript": "^2.2.3",
-    "lodash": "^4.17.5"
+    "coffeescript": "^2.4.1",
+    "dotenv": "^8.2.0",
+    "lodash": "^4.17.15",
+    "pretty": "^2.0.0"
   }
 }

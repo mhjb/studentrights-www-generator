@@ -1,12 +1,15 @@
+require('dotenv').config()
 cheerio = require 'cheerio'
 fs = require 'fs'
 
-acts_and_links = require './acts-and-links'
-template = fs.readFileSync 'templates/template.html'
-intro = fs.readFileSync 'templates/intro.html'
-path = '../www/problems-at-school/'
+{ write_file_with_template } = require './templater'
+{ schematize } = require './schema'
 
-error_handler = (err) -> console.log err if err
+{ path } = process.env
+
+acts_and_links = require './acts-and-links'
+intro = fs.readFileSync 'templates/intro.html'
+
 
 switch_class_for_tag = (class_name, tag) ->
   $ class_name
@@ -15,24 +18,6 @@ switch_class_for_tag = (class_name, tag) ->
         .replace /(\?)/g, ''
       $(e).replaceWith "<#{tag} id='#{id}'>#{$(e).html()}</#{tag}>"
 
-write_file_with_template = (filename, title, content, prev, next) ->
-  populated_template = template.toString()
-    .replace /{{title}}/, title
-    .replace /{{book}}/, content
-  if prev
-    populated_template = populated_template
-      .replace /{{prev}}/g, prev
-      .replace /{{#if}}(.*){{\/if}}/g, '$1'
-  else
-    populated_template = populated_template.replace /{{#if}}.*{{prev}}.*{{\/if}}/, ''
-  if next
-    populated_template = populated_template
-      .replace /{{next}}/g, next
-      .replace /{{#if}}(.*){{\/if}}/g, '$1'
-  else
-    populated_template = populated_template.replace /{{#if}}.*{{next}}.*{{\/if}}/, ''
-  fs.writeFile path + filename, populated_template, 'utf8', error_handler
-  console.log "Writing #{path}#{filename}"
 
 remove_wrapping_elements = (array_of_selectors) ->
   array_of_selectors.forEach (selector) ->
@@ -40,15 +25,19 @@ remove_wrapping_elements = (array_of_selectors) ->
       .each (i, e) ->
         $(e).replaceWith $(e).html()
 
+
 remove_chapter_number = (text) -> text.replace /(\d+\. ?\t)/g, ''
 
+
 get_chapter_number = (text) -> (text.match /^(\d+)\./)?[1]
+
 
 section_to_filename = (section) ->
   section
     .replace /( )/g, '-'
     .replace /(\t)/g, '-'
     .replace /([:,’“”])/g, ''
+
 
 tidy_citation = (citation) ->
   citation
@@ -87,8 +76,9 @@ switch_class_for_tag 'p.Heading-4-first', 'h4'
 switch_class_for_tag 'p.Heading-5', 'h5'
 
 # I don't know why I need to do this
-fs.writeFileSync "export/problems at school.html", $.html(), 'utf8', error_handler
+fs.writeFileSync "export/problems at school.html", $.html(), 'utf8', console.error
 $ = cheerio.load fs.readFileSync "export/problems at school.html"
+
 
 # clean up links & anchors
 $('a').each (i, e) ->
@@ -102,6 +92,7 @@ $('a').each (i, e) ->
   no_page_refs = $(e).text().replace /, page \d+/g, ''
   $(e).text(no_page_refs)
 
+
 # link up legislation
 $('p.legislation').each (i, e) ->
   citations = $(e).text().split(/; ?/)
@@ -114,6 +105,7 @@ $('p.legislation').each (i, e) ->
     else
       links += "#{citation}<br/>"
   if links then $(e).html links
+
 
 # make phone numbers clickable
 $('p').each (i, e) ->
@@ -136,9 +128,11 @@ $('h1').each (i, e) ->
   else
     main_contents += "<li><a href=\"#{h1_file}\">#{h1_heading}</a>\n"
 
+  schematize full_content, $
+
   sections = []
   index_before_section = pages.length
-  full_content.filter('h2').each (i,e) ->
+  full_content.filter('h2').each (i, e) ->
     h2_heading = $(e).text().replace(/(\t)/g, ' ')
     h2_file = section_to_filename h2_heading + '.html'
     h2_breadcrumb = "<p class=\"breadcrumb\"><a href=\"../index.html\">Student Rights</a>\n > <a href=\"index.html\">Problems at School</a> > <a href=\"#{h1_file}\">#{h1_heading}</a> > #{h2_heading}</p>\n"
@@ -174,6 +168,7 @@ pages.forEach (page, index) ->
   if index < pages.length - 1 then next = pages[index + 1].file else next = null
   write_file_with_template page.file, page.title, page.content, prev, next
 
+
 headings = []
 ['h5', 'h4', 'h3', 'h2', 'h1'].forEach (selector) ->
   $(selector).each (i, e) ->
@@ -188,4 +183,4 @@ headings = []
       label: label
       link: "#{section_to_filename section}.html##{id}"
 
-fs.writeFileSync "#{path}/headings.json", JSON.stringify(headings, null, 4), 'utf8', error_handler
+fs.writeFileSync "#{path}/headings.json", JSON.stringify(headings, null, 4), 'utf8', console.error
