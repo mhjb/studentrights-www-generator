@@ -1,3 +1,5 @@
+# Applies https://search.google.com/test/rich-results?utm_campaign=devsite&utm_medium=microdata&utm_source=faq-page
+
 extend_cheerio = require('./extend_cheerio')
 
 module.exports =
