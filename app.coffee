@@ -40,7 +40,9 @@ remove_wrapping_elements = (array_of_selectors) ->
       .each (i, e) ->
         $(e).replaceWith $(e).html()
 
-remove_chapter_number = (text) -> text.replace /(\d\. ?\t)/g, ''
+remove_chapter_number = (text) -> text.replace /(\d+\. ?\t)/g, ''
+
+get_chapter_number = (text) -> (text.match /^(\d+)\./)?[1]
 
 section_to_filename = (section) ->
   section
@@ -124,11 +126,15 @@ main_contents = "<ul class=\"contents\">\n"
 $('h1').each (i, e) ->
   h1_heading = remove_chapter_number $(e).text()
   h1_file = section_to_filename h1_heading + '.html'
+  h1_image = section_to_filename h1_heading + '.jpg'
   h1_breadcrumb = "<p class=\"breadcrumb\"><a href=\"../index.html\">Student Rights</a>\n > <a href=\"index.html\">Problems at School</a>\n > #{h1_heading}</p>"
   content = h1_breadcrumb + "<h1>#{h1_heading}</h1>\n" + $(e).nextUntil('h2,h1')
   full_content = $(e).nextUntil('h1')
 
-  main_contents += "<li><a href=\"#{h1_file}\">#{h1_heading}</a>\n"
+  if get_chapter_number $(e).text()
+    main_contents += "<li><a href=\"#{h1_file}\"><img src=\"../img/chapter/#{h1_image}\" />#{h1_heading}</a>\n"
+  else
+    main_contents += "<li><a href=\"#{h1_file}\">#{h1_heading}</a>\n"
 
   sections = []
   index_before_section = pages.length
