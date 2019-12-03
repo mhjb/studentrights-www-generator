@@ -4,6 +4,8 @@ fs = require 'fs'
 
 { write_file_with_template } = require './templater'
 { schematize } = require './schema'
+sitemap = require './sitemap'
+
 
 { path } = process.env
 
@@ -167,6 +169,9 @@ pages.forEach (page, index) ->
   if index > 0 then prev = pages[index - 1].file else prev = null
   if index < pages.length - 1 then next = pages[index + 1].file else next = null
   write_file_with_template page.file, page.title, page.content, prev, next
+
+
+sitemap(pages.map((p) -> p.file)).then((sm) -> fs.writeFileSync "#{path}/../sitemap.xml", sm, 'utf8', console.error)
 
 
 headings = []
