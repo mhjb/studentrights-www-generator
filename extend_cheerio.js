@@ -27,15 +27,5 @@ module.exports = (function() {
             },
         });
     };
-
-    if ("test") {
-        $ = cheerio.load("<html><body><div><p><span>This <em>is <i>test</p><span>More <em>test");
-        extendCheerio($);
-        $('span').wrapAll('<section>');
-        var passed = ($.html() === '<html><body><div><p><section><span>This <em>is <i>test</i></em>'+
-                          '</span><span>More <em>test</em></span></section></p></div></body></html>');
-        console.log("passed: " + (passed ? "yes" : "no"));
-        // console.log($.html() + "\n\n");
-    }
     return extendCheerio;
 })();

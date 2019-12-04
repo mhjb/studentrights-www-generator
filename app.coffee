@@ -182,10 +182,13 @@ headings = []
     if selector is 'h1' or selector is 'h2'
       section = remove_chapter_number $(e).text()
     else
-      section = $(e).prevAll('h2,h1').eq(0).text()
+      section = $(e).prevAll('h2,h1').eq(0).text() or 
+                $(e).parent().prevAll('h2,h1').eq(0).text() or
+      if not section then console.error 'Section not found for: ', $(e).html()
       id = $(e).attr('id')
-    headings.push
-      label: label
-      link: "#{section_to_filename section}.html##{id}"
+    if section
+      headings.push
+        label: label
+        link: "#{section_to_filename section}.html##{id}"
 
 fs.writeFileSync "#{path}/headings.json", JSON.stringify(headings, null, 4), 'utf8', console.error
