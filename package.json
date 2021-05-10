@@ -13,7 +13,7 @@
     "cheerio": "^0.22.0",
     "coffeescript": "^2.5.1",
     "dotenv": "^8.2.0",
-    "lodash": "^4.17.19",
+    "lodash": "^4.17.21",
     "pretty": "^2.0.0"
   }
 }
